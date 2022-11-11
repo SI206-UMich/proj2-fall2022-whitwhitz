@@ -46,13 +46,22 @@ def get_listings_from_search_results(html_file):
             cost_list[i] = int(found_cost[0])
         # print(cost_list)
 
-        #
-        for i in soup.find_all('a', class_='rfexzly dir dir-ltr'):
-            id_list.append(i.get('href'))
+        # putting all ids into a list
+        id_list = soup.find_all('a', class_='ln2bl2p dir dir-ltr')
         for i in range(0, len(id_list)):
-            found_id = re.findall("^\$(\d+)", id_list[i])
-            id_list[i] = int(id_list[0])
-        print(id_list)
+            id_list[i] = re.findall(r'\d+', id_list[i]['href'])
+            id_list[i] = id_list[i][0]
+        # print(id_list)
+
+        # combine it all into final list
+        final_list = []
+        for i in range(len(title_list)):
+            temp_tuple = (title_list[i], cost_list[i], id_list[i])
+            final_list.append(temp_tuple)
+
+        # print(final_list)
+        return final_list
+
 
 
 
