@@ -63,11 +63,6 @@ def get_listings_from_search_results(html_file):
         return final_list
 
 
-
-
-
-
-
 def get_listing_information(listing_id):
     """
     Write a function to return relevant information in a tuple from an Airbnb listing id.
@@ -92,7 +87,44 @@ def get_listing_information(listing_id):
         number of bedrooms
     )
     """
-    pass
+    with open('html_files/listing_' + listing_id + '.html', 'r') as f:
+        contents = f.read()
+        soup = BeautifulSoup(contents, 'html.parser')
+
+        # get policy number
+        li = soup.find('li', class_='f19phm7j dir dir-ltr')
+        policy = li.find('span', class_='ll4r2nl dir dir-ltr').text
+        if 'pending' in policy.lower():
+            policy = 'Pending'
+        elif ('exempt' in policy.lower()) or ('not needed' in policy.lower()):
+            policy = 'Exempt'
+
+        # print(policy)
+
+        # get place type, from h2 heading
+        place_type = soup.find('h2', class_='_14i3z6h').text
+        if 'private' in place_type.lower():
+            place_type = 'Private Room'
+        elif 'shared' in place_type.lower():
+            place_type = 'Shared Room'
+        else:
+            place_type = 'Entire Room'
+        
+        # print(place_type)
+
+        # get num of bedrooms 
+        li_list = soup.find_all('li', class_='l7n4lsf dir dir-ltr')
+        li_spans = li_list[1].find_all('span')
+        num_bedrooms = li_spans[2].text
+        if 'studio' in num_bedrooms.lower():
+            num_bedroom = 1
+        else:
+            num_bedroom = int(num_bedrooms[0])
+
+        # print(num_bedroom)
+
+        #final tuple
+        return (policy, place_type, num_bedroom)
 
 
 def get_detailed_listing_database(html_file):
@@ -109,7 +141,18 @@ def get_detailed_listing_database(html_file):
         ...
     ]
     """
-    pass
+    listing_full = []
+
+    listings = get_listings_from_search_results(html_file)
+    for listing in listings:
+        listing_details = get_listing_information(listing[2])
+        temp_tuple = (listing[0], listing[1], listing[2], listing_details[0], listing_details[1], listing_details[2])
+        listing_full.append(temp_tuple)
+
+    return listing_full
+
+
+
 
 
 def write_csv(data, filename):
@@ -187,11 +230,12 @@ class TestCases(unittest.TestCase):
         # check that the variable you saved after calling the function is a list
         self.assertEqual(type(listings), list)
         # check that each item in the list is a tuple
-
+        for i in listings:
+            self.assertEqual(type(i), type(tuple()))
         # check that the first title, cost, and listing id tuple is correct (open the search results html and find it)
-
+        self.assertEqual(listings[0], ('Loft in Mission District', 210, '1944564'))
         # check that the last title is correct (open the search results html and find it)
-        pass
+        self.assertEqual(listings[-1][0], 'Guest suite in Mission District')
 
     def test_get_listing_information(self):
         html_list = ["1623609",
