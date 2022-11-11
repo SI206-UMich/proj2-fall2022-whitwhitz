@@ -25,7 +25,38 @@ def get_listings_from_search_results(html_file):
         ('Loft in Mission District', 210, '1944564'),  # example
     ]
     """
-    pass
+    with open(html_file, 'r') as f:
+        contents = f.read()
+        soup = BeautifulSoup(contents, 'html.parser')
+
+        title_list = []
+        cost_list = []
+        id_list = []
+
+        # putting all titles into list        
+        for i in soup.find_all('div', class_="t1jojoys dir dir-ltr"):
+            title_list.append(i.text)
+        # print(title_list)
+
+        # putting all costs into a list
+        for i in soup.find_all('div', class_="phbjkf1 dir dir-ltr"):
+            cost_list.append(i.text)
+        for i in range(0, len(cost_list)):
+            found_cost = re.findall("^\$(\d+)", cost_list[i])
+            cost_list[i] = int(found_cost[0])
+        # print(cost_list)
+
+        #
+        for i in soup.find_all('a', class_='rfexzly dir dir-ltr'):
+            id_list.append(i.get('href'))
+        for i in range(0, len(id_list)):
+            found_id = re.findall("^\$(\d+)", id_list[i])
+            id_list[i] = int(id_list[0])
+        print(id_list)
+
+
+
+
 
 
 def get_listing_information(listing_id):
@@ -58,7 +89,7 @@ def get_listing_information(listing_id):
 def get_detailed_listing_database(html_file):
     """
     Write a function that calls the above two functions in order to return
-    the complete listing information using the functions you’ve created.
+    the complete listing information using the functions you've created.
     This function takes in a variable representing the location of the search results html file.
     The return value should be in this format:
 
