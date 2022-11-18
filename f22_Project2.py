@@ -178,11 +178,14 @@ def write_csv(data, filename):
 
     with open(filename, 'w', newline='') as f:
         writer = csv.writer(f)
+
+        #creating header row
         header = ["Listing Title,Cost,Listing ID,Policy Number,Place Type,Number of Bedrooms"]
         writer.writerow(header)
         
         sorted_list = sorted(data, key = lambda x: int(x[1]))
 
+        # add in the rest
         for place in sorted_list:
             writer.writerow(place)
 
